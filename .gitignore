@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# MacOS files
+.DS_Store
+
+# Data files (for now):
+**/*.parquet
+**/*.csv
