@@ -3,40 +3,20 @@ import os
 import numpy as np
 import pandas as pd
 
-# -------------------------
-# Utility: make result dirs
-# -------------------------
+# Where to save the output
 RESULTS_DIR = "results"
 
-for d in [RESULTS_DIR]:
-    os.makedirs(d, exist_ok=True)
-
-
-# -------------------------
-# Parameters
-# -------------------------
+# Constant params
 VPP_EVENT_MIN_DISCHARGE_PRICE = 300
 MIN_CAPACITY_LIMIT = 0.2  # minimum SoC left in battery for owner = 20%
 MONTHLY_CUMSUM_ALLOCATION = 250 / 12
 
 TIMESTEP_HOURS = 5 / 60  # 5 minute intervals = 1/12h for power<->energy conversion
 
-battery_starting_params = pd.read_csv("data/site_params.csv", index_col="site_id")
 
-# -------------------------
-# Input Data
-# -------------------------
-wholesale_prices = pd.read_parquet("data/nsw_wholesale_price.parquet")
-
-all_sites_load_and_pv = pd.read_parquet(
-    "data/meter_data/household_load_pv_5min_2025.parquet"
-)
-all_sites_load_and_pv["local_datetime"] = pd.to_datetime(
-    all_sites_load_and_pv["datetime"], utc=True
-).dt.tz_convert("Australia/Sydney")
-
-
-def get_site_load_data(all_sites: pd.DataFrame, site_id: str) -> pd.DataFrame:
+def get_site_load_data(
+    all_sites: pd.DataFrame, site_id: str, wholesale_prices: pd.DataFrame
+) -> pd.DataFrame:
     site_data = (
         all_sites[all_sites["site_id"] == site_id].copy().set_index("local_datetime")
     )
@@ -118,7 +98,7 @@ def battery_operation_loop(
     result_rows = [
         {
             "local_datetime": site_data.index[0],
-            "soe": prev_soe,
+            "soc": starting_soc,
             "charge": 0.0,
             "discharge": 0.0,
             "event": False,
@@ -160,7 +140,7 @@ def battery_operation_loop(
 
         res = {
             "local_datetime": timestamp,
-            "soe": new_soe,
+            "soc": new_soe / max_capacity,
             "charge": charge,
             "discharge": discharge,
             "event": event,
@@ -179,9 +159,14 @@ def battery_operation_loop(
 # -------------------------
 
 
-def run_site(site_id: str) -> pd.DataFrame:
+def run_site(
+    site_id: str,
+    all_sites_load_and_pv: pd.DataFrame,
+    battery_starting_params: pd.DataFrame,
+    wholesale_prices: pd.DataFrame,
+) -> pd.DataFrame:
     site_params = battery_starting_params.loc[site_id]
-    site_data = get_site_load_data(all_sites_load_and_pv, site_id)
+    site_data = get_site_load_data(all_sites_load_and_pv, site_id, wholesale_prices)
 
     battery_results = battery_operation_loop(
         site_data,
@@ -205,11 +190,34 @@ def run_site(site_id: str) -> pd.DataFrame:
         - site_results["discharge"] * one_way_efficiency
     )
     site_results["site_id"] = site_id
+
+    for col in ["charge", "discharge", "soc", "grid_net_load"]:
+        site_results[col] = site_results[col].round(3)
+
     return site_results
 
 
 def run_all_sites() -> pd.DataFrame:
-    all_results = [run_site(site_id) for site_id in battery_starting_params.index]
+    for d in [RESULTS_DIR]:
+        os.makedirs(d, exist_ok=True)
+
+    battery_starting_params = pd.read_csv("data/site_params.csv", index_col="site_id")
+
+    wholesale_prices = pd.read_parquet("data/nsw_wholesale_price.parquet")
+
+    all_sites_load_and_pv = pd.read_parquet(
+        "data/meter_data/household_load_pv_5min_2025.parquet"
+    )
+    all_sites_load_and_pv["local_datetime"] = pd.to_datetime(
+        all_sites_load_and_pv["datetime"], utc=True
+    ).dt.tz_convert("Australia/Sydney")
+
+    all_results = [
+        run_site(
+            site_id, all_sites_load_and_pv, battery_starting_params, wholesale_prices
+        )
+        for site_id in battery_starting_params.index
+    ]
     return pd.concat(all_results)
 
 

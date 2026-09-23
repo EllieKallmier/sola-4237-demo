@@ -1,0 +1,109 @@
+{
+    "Name": "Energy Australia VPP Plan",
+    "Parameters": {
+        "Daily": {
+            "Value": 1.165,
+            "Unit": "$/Day"
+        },
+        "BlockDailyFiT": {
+            "Block1": {
+                "Value": 0.08,
+                "Unit": "$/kWh",
+                "HighBound": 10
+            },
+            "Block2": {
+                "Value": 0.03,
+                "Unit": "$/kWh",
+                "HighBound": "Infinity"
+            }
+        },
+        "TOU": {
+            "Peak": {
+                "Month": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12
+                ],
+                "TimeIntervals": {
+                    "T1": [
+                        "07:00:00",
+                        "10:00:00"
+                    ],
+                    "T2": [
+                        "15:00:00",
+                        "22:00:00"
+                    ]
+                },
+                "Unit": "$/kWh",
+                "Value": 0.545,
+                "Weekday": true,
+                "Weekend": true
+            },
+            "Off Peak": {
+                "Month": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12
+                ],
+                "TimeIntervals": {
+                    "T1": [
+                        "10:00:00",
+                        "14:00:00"
+                    ]
+                },
+                "Unit": "$/kWh",
+                "Value": 0.175,
+                "Weekday": true,
+                "Weekend": true
+            },
+            "Shoulder": {
+                "Month": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12
+                ],
+                "TimeIntervals": {
+                    "T1": [
+                        "22:00:00",
+                        "07:00:00"
+                    ],
+                    "T2": [
+                        "14:00:00",
+                        "15:00:00"
+                    ]
+                },
+                "Unit": "$/kWh",
+                "Value": 0.3398,
+                "Weekday": true,
+                "Weekend": true
+            }
+        }
+    }
+}
