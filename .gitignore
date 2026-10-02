@@ -18,6 +18,7 @@ wheels/
 # Data files (for now):
 **/*.parquet
 **/*.csv
+answer_key/*
 
 # Local-only scripts:
 */setup/*
