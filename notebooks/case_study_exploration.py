@@ -8,8 +8,9 @@ app = marimo.App(width="medium")
 def _():
     import marimo as mo
     import pandas as pd
+    import plotly.express as px
 
-    return mo, pd
+    return mo, pd, px
 
 
 @app.cell
@@ -35,7 +36,7 @@ def _(mo):
 def _(DATA_DIR, pd):
     circuit_data = pd.read_parquet(DATA_DIR / "vpp_circuit_data.parquet")
     site_metadata = pd.read_csv(DATA_DIR / "site_metadata.csv")
-    return
+    return (circuit_data,)
 
 
 @app.cell
@@ -127,6 +128,26 @@ def _(mo):
     What do we expect household load, solar and battery data to look like?
     Does this data match?
     """)
+    return
+
+
+@app.cell
+def _(circuit_data, mo):
+    # UI elements must be defined in one cell and read (.value) in another:
+    # changing the dropdown then re-runs only the cells that read it
+    site_picker = mo.ui.dropdown(
+        options=sorted(circuit_data["site_id"].unique()),
+        value="site_001",
+        label="Site",
+    )
+    site_picker
+    return (site_picker,)
+
+
+@app.cell
+def _(circuit_data, px, site_picker):
+    _site_data = circuit_data[circuit_data["site_id"] == site_picker.value]
+    px.line(_site_data, x="timestamp", y="value", color="circuit")
     return
 
 
