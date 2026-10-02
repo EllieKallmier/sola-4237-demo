@@ -78,9 +78,39 @@ def _(mo):
     mo.md(r"""
     ## 2. Statistical information
 
-    What do we need to understand about the *contents* of the data itself? Is there 
+    What do we need to understand about the *contents* of the data itself? Is there
     anything that you're curious about that we can explore here?
     """)
+    return
+
+
+@app.cell
+def _():
+    INTERVALS_PER_DAY = 288  # 5-minute intervals
+
+    def average_daily_by_circuit(data):
+        """Average daily total per site (rows) and circuit (columns), in source units.
+
+        Uses mean interval value x intervals per day rather than summing calendar
+        days: this avoids picking a day boundary (i.e. a timezone), and missing
+        intervals don't drag the average down.
+        """
+        return (
+            data.groupby(["site_id", "circuit"])["value"]
+            .mean()
+            .mul(INTERVALS_PER_DAY)
+            .unstack("circuit")
+        )
+
+    def count_missing_by_circuit(data):
+        """Number of NaN values per site (rows) and circuit (columns)."""
+        return (
+            data.assign(missing=data["value"].isna())
+            .groupby(["site_id", "circuit"])["missing"]
+            .sum()
+            .unstack("circuit")
+        )
+
     return
 
 
