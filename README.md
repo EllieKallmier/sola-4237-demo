@@ -28,7 +28,7 @@ intentionally left empty to be filled in live.
 1. **Get a copy of the code**, either by cloning with git:
 
     ```bash
-    git clone TODO_REPO_URL
+    git clone https://github.com/EllieKallmier/sola-4237-demo.git
     cd sola-4237-demo
     ```
 
