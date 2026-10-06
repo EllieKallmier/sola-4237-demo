@@ -16,9 +16,7 @@ __marimo__/
 # MacOS files
 .DS_Store
 
-# Data files (for now):
-**/*.parquet
-**/*.csv
+# Challenge answers:
 answer_key/*
 
 # Local-only scripts:
