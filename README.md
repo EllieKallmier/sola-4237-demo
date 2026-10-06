@@ -64,12 +64,15 @@ intentionally left empty to be filled in live.
 From the project folder, run:
 
 ```bash
-uv run marimo edit notebooks/case_study_exploration.py
+uv run marimo edit notebooks/case_study_exploration.py --watch
 ```
 
 `uv run` runs the command inside this project's virtual environment, so there's no need to
 activate it first. marimo will open the notebook in your web browser. To stop it, go back to the
 terminal and press `Ctrl + C`.
+
+The `--watch` flag just makes sure that if we make changes in the .py file locally,
+they'll be reflected in the browser editor too.
 
 ### Troubleshooting
 
