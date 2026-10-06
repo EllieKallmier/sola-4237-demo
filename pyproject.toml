@@ -8,6 +8,7 @@ dependencies = [
     "ipdb>=0.13.13",
     "ipykernel>=7.3.0",
     "jupyter>=1.1.1",
+    "marimo>=0.25.1",
     "nemosis>=3.8.1",
     "numpy>=2.5.3",
     "pandas>=3.0.6",

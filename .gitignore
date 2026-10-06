@@ -5,13 +5,20 @@ build/
 dist/
 wheels/
 *.egg-info
+__marimo__/
 
 # Virtual environments
 .venv
 
+# Local caches
+.ruff_cache
+
 # MacOS files
 .DS_Store
 
-# Data files (for now):
-**/*.parquet
-**/*.csv
+# Challenge answers:
+answer_key/*
+
+# Local-only scripts:
+*/setup/*
+notes/*.md
